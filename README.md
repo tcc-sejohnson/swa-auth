@@ -1,2 +1,2 @@
 # swa-auth
-A super-lightweight Auth library for Azure Static Web Apps.
+A super-lightweight Auth library for Azure Static Web Apps with React.
