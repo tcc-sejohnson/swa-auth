@@ -70,7 +70,7 @@ export type User = {
 
 export interface PrivateComponentProps {
   allowedRoles: Roles;
-  allBut: boolean;
+  allBut?: boolean;
   children: React.ReactNode;
 }
 
