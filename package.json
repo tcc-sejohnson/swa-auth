@@ -2,15 +2,21 @@
   "name": "swa-auth",
   "version": "1.0.2",
   "description": "A super-lightweight Auth library for Azure Static Web Apps.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/auth.js",
+  "types": "dist/auth.d.ts",
   "repository": "git@github.com:tcc-sejohnson/swa-auth.git",
   "author": "S. Elliott Johnson",
-  "license": "GNU GPLv3",
+  "license": "GNU GPL V3",
+  "bugs": {
+      "url": "https://github.com/tcc-sejohnson/swa-auth/issues"
+  },
+  "homepage": "https://github.com/tcc-sejohnson/swa-auth/issues#readme",
   "private": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "tsc"
+    "prepublish": "tsc",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "tslint -p tsconfig.json"
   },
   "dependencies": {
     "lodash": "^4.17.20",
