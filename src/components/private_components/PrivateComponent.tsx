@@ -8,9 +8,9 @@ import { useAuth, authorize, PrivateComponent } from '../../auth';
  * classes of user.
  */
 const PrivateRoute: PrivateComponent = ({ allowedRoles, allBut, children, ...rest }) => {
-    const auth = useAuth();
-    const isAuthorized = authorize(allowedRoles, auth.user, allBut);
-    return <Route {...rest} render={() => (isAuthorized ? children : null)} />;
+  const auth = useAuth();
+  const isAuthorized = authorize(allowedRoles, auth.user, allBut);
+  return <Route {...rest} render={() => (isAuthorized ? children : null)} />;
 };
 
 export default PrivateRoute;

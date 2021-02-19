@@ -9,29 +9,29 @@ import { PrivateRouteComponent } from './privateRouteTypes';
  * else, if the user is logged in, redirect to the unauthorized page.
  */
 const PrivateRouteLoginOrUnauthorizedRedirect: PrivateRouteComponent = ({
-    allowedRoles,
-    allBut,
-    children,
-    ...rest
+  allowedRoles,
+  allBut,
+  children,
+  ...rest
 }) => {
-    const auth = useAuth();
-    const isAuthorized = authorize(allowedRoles, auth.user, allBut);
-    const renderComponents = () => {
-        if (isAuthorized) {
-            return children;
-        }
-        if (auth.user.userRoles.length === 1) {
-            if (auth.user.userRoles[0] === DefaultRoles.Anonymous) {
-                return <Redirect to='/login' />;
-            }
-        }
-        if (auth.user.userRoles.length === 0) {
-            return <Redirect to='/login' />;
-        }
-        return <Redirect to='/unauthorized' />;
-    };
+  const auth = useAuth();
+  const isAuthorized = authorize(allowedRoles, auth.user, allBut);
+  const renderComponents = () => {
+    if (isAuthorized) {
+      return children;
+    }
+    if (auth.user.userRoles.length === 1) {
+      if (auth.user.userRoles[0] === DefaultRoles.Anonymous) {
+        return <Redirect to="/login" />;
+      }
+    }
+    if (auth.user.userRoles.length === 0) {
+      return <Redirect to="/login" />;
+    }
+    return <Redirect to="/unauthorized" />;
+  };
 
-    return <Route {...rest} render={renderComponents} />;
+  return <Route {...rest} render={renderComponents} />;
 };
 
 export default PrivateRouteLoginOrUnauthorizedRedirect;

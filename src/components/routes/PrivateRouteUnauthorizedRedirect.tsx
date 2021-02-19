@@ -8,9 +8,9 @@ import { PrivateRouteComponent } from './privateRouteTypes';
  * @param param0
  */
 const PrivateRouteLoginRedirect: PrivateRouteComponent = ({ allowedRoles, allBut, children, ...rest }) => {
-    const auth = useAuth();
-    const isAuthorized = authorize(allowedRoles, auth.user, allBut);
-    return <Route {...rest} render={() => (isAuthorized ? children : <Redirect to={auth.unauthorizedPath} />)} />;
+  const auth = useAuth();
+  const isAuthorized = authorize(allowedRoles, auth.user, allBut);
+  return <Route {...rest} render={() => (isAuthorized ? children : <Redirect to={auth.unauthorizedPath} />)} />;
 };
 
 export default PrivateRouteLoginRedirect;
