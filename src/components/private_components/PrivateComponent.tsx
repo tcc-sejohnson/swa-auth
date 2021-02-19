@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth, authorize, PrivateComponent } from '../../auth';
+import { useAuth, authorize, PrivateComponent } from '../../auth/auth';
 
 /**
  * Renders its children if the user is in one of the allowed roles,

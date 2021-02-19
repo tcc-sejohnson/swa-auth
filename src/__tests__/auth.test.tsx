@@ -1,4 +1,4 @@
-import { authorize, DefaultRoles, User } from '../auth';
+import { authorize, DefaultRoles, User } from '../auth/auth';
 import { cloneDeep } from 'lodash';
 
 const DEFAULT_TEST_USER: User = {

@@ -1,9 +1,9 @@
-import React from 'react';
-import { PrivateComponentProps } from '../../auth';
+import { RouteComponentProps } from 'react-router-dom';
+import { PrivateComponentProps } from '../../auth/auth';
 
 export type PrivateRouteComponentProps = {
-  path: string;
-  unauthorizedRedirect?: React.ReactNode;
-} & PrivateComponentProps;
+  [key: string]: any;
+} & PrivateComponentProps &
+  Partial<RouteComponentProps>;
 
-export type PrivateRouteComponent = (props: PrivateRouteComponentProps & { [key: string]: any }) => JSX.Element;
+export type PrivateRouteComponent = (props: PrivateRouteComponentProps) => JSX.Element;

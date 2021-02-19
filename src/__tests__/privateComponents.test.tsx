@@ -1,6 +1,7 @@
 import React from 'react';
-import { AuthorizationContext, DevSettings, DefaultRoles, User, ProvideAuth } from '../auth';
+import { AuthorizationContext, DevSettings, DefaultRoles, User, ProvideAuth } from '../auth/auth';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import { cloneDeep } from 'lodash';
 import PrivateComponent from '../components/private_components/PrivateComponent';
 
@@ -34,8 +35,8 @@ describe('PrivateComponent correctly renders based on authorization', () => {
         </PrivateComponent>
       </ProvideAuth>
     );
-    const hopefullyDiv = screen.getByText(SUCCESS_MESSAGE);
-    expect(hopefullyDiv).toBeTruthy();
+    const hopefullyDiv = screen.queryByText(SUCCESS_MESSAGE);
+    expect(hopefullyDiv).toBeInTheDocument();
   });
   test('PrivateComponent renders component when user holds a role other than the roles listed in allowedRoles when allBut == true, even when having a role listed in allowedRoles', () => {
     const testContext = cloneDeep(CUSTOM_CONTEXT);
@@ -47,8 +48,8 @@ describe('PrivateComponent correctly renders based on authorization', () => {
         </PrivateComponent>
       </ProvideAuth>
     );
-    const hopefullyDiv = screen.getByText(SUCCESS_MESSAGE);
-    expect(hopefullyDiv).toBeTruthy();
+    const hopefullyDiv = screen.queryByText(SUCCESS_MESSAGE);
+    expect(hopefullyDiv).toBeInTheDocument();
   });
   test('PrivateComponent renders component when user holds a role included in the roles listed in allowedRoles when allBut == false', () => {
     const testContext = cloneDeep(CUSTOM_CONTEXT);
@@ -60,10 +61,10 @@ describe('PrivateComponent correctly renders based on authorization', () => {
         </PrivateComponent>
       </ProvideAuth>
     );
-    const hopefullyDiv = screen.getByText(SUCCESS_MESSAGE);
-    expect(hopefullyDiv).toBeTruthy();
+    const hopefullyDiv = screen.queryByText(SUCCESS_MESSAGE);
+    expect(hopefullyDiv).toBeInTheDocument();
   });
-  test('PrivateComponent does not render its component when user not holding any roles in allowedRoles when allBut == false', () => {
+  test('PrivateComponent does not render its component when user does not hold any roles in allowedRoles when allBut == false', () => {
     const testContext = cloneDeep(CUSTOM_CONTEXT);
     testContext.devSettings.userOverride.userRoles = [DefaultRoles.Anonymous, DefaultRoles.Authenticated];
     render(
@@ -73,8 +74,8 @@ describe('PrivateComponent correctly renders based on authorization', () => {
         </PrivateComponent>
       </ProvideAuth>
     );
-    const hopefullyNotDiv = () => screen.getByText(SUCCESS_MESSAGE);
-    expect(hopefullyNotDiv).toThrow(/Unable to find an element with the text:/);
+    const hopefullyNotDiv = screen.queryByText(SUCCESS_MESSAGE);
+    expect(hopefullyNotDiv).not.toBeInTheDocument();
   });
   test('PrivateComponent does not render its component when user holds only roles in allowedRoles when allBut == true', () => {
     const testContext = cloneDeep(CUSTOM_CONTEXT);
@@ -86,7 +87,7 @@ describe('PrivateComponent correctly renders based on authorization', () => {
         </PrivateComponent>
       </ProvideAuth>
     );
-    const hopefullyNotDiv = () => screen.getByText(SUCCESS_MESSAGE);
-    expect(hopefullyNotDiv).toThrow(/Unable to find an element with the text:/);
+    const hopefullyNotDiv = screen.queryByText(SUCCESS_MESSAGE);
+    expect(hopefullyNotDiv).not.toBeInTheDocument();
   });
 });
