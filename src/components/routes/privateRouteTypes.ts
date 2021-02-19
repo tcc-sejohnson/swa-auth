@@ -2,6 +2,7 @@ import React from 'react';
 import { PrivateComponentProps } from '../../auth';
 
 export type PrivateRouteComponentProps = {
+  path: string;
   unauthorizedRedirect?: React.ReactNode;
 } & PrivateComponentProps;
 

@@ -9,6 +9,7 @@ import { PrivateRouteComponent } from './privateRouteTypes';
  * else, if the user is logged in, redirect to the unauthorized page.
  */
 const PrivateRouteLoginOrUnauthorizedRedirect: PrivateRouteComponent = ({
+  path,
   allowedRoles,
   allBut,
   children,
@@ -31,7 +32,7 @@ const PrivateRouteLoginOrUnauthorizedRedirect: PrivateRouteComponent = ({
     return <Redirect to="/unauthorized" />;
   };
 
-  return <Route {...rest} render={renderComponents} />;
+  return <Route path={path} {...rest} render={renderComponents} />;
 };
 
 export default PrivateRouteLoginOrUnauthorizedRedirect;
