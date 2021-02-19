@@ -75,7 +75,7 @@ export interface PrivateComponentProps {
 }
 
 export interface ProvideAuthProps {
-  customContext?: AuthorizationContext;
+  customContext: Partial<AuthorizationContext>;
   children: React.ReactNode;
 }
 
@@ -101,8 +101,11 @@ const getUser = async (userSetter: (user: User) => void): Promise<void> => {
 
 const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
 
-const useProvideAuth = (customContext?: AuthorizationContext) => {
-  const [ctx, setCtx] = useState<AuthorizationContext>(customContext ?? DEFAULT_AUTH_CONTEXT);
+const useProvideAuth = (customContext: Partial<AuthorizationContext>) => {
+  const [ctx, setCtx] = useState<AuthorizationContext>({
+    ...DEFAULT_AUTH_CONTEXT,
+    ...customContext,
+  });
   useEffect(() => {
     const newContext = cloneDeep(ctx);
     if (ctx.devSettings.on) {
