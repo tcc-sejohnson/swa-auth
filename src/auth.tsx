@@ -2,22 +2,22 @@ import React, { useContext, createContext, useState, useEffect } from 'react';
 import { cloneDeep } from 'lodash';
 
 const DEFAULT_USER: User = {
-    identityProvider: '',
-    userId: '',
-    userDetails: '',
-    userRoles: [],
+  identityProvider: '',
+  userId: '',
+  userDetails: '',
+  userRoles: [],
 };
 
 const DEFAULT_DEV_SETTINGS: DevSettings = {
-    on: false,
-    userOverride: DEFAULT_USER,
+  on: false,
+  userOverride: DEFAULT_USER,
 };
 
 const DEFAULT_AUTH_CONTEXT: AuthorizationContext = {
-    user: DEFAULT_USER,
-    loginPath: '/login',
-    unauthorizedPath: '/login',
-    devSettings: DEFAULT_DEV_SETTINGS,
+  user: DEFAULT_USER,
+  loginPath: '/login',
+  unauthorizedPath: '/login',
+  devSettings: DEFAULT_DEV_SETTINGS,
 };
 
 /**
@@ -26,10 +26,10 @@ const DEFAULT_AUTH_CONTEXT: AuthorizationContext = {
  * You can also union your enum with this one to "inherit" its members.
  */
 export enum DefaultRoles {
-    Authenticated = 'authenticated',
-    Anonymous = 'anonymous',
-    GlobalAdmin = 'global_admin',
-    GlobalViewer = 'global_viewer',
+  Authenticated = 'authenticated',
+  Anonymous = 'anonymous',
+  GlobalAdmin = 'global_admin',
+  GlobalViewer = 'global_viewer',
 }
 
 /**
@@ -38,45 +38,45 @@ export enum DefaultRoles {
  * local development.
  */
 export interface DevSettings {
-    on: boolean;
-    userOverride: User;
+  on: boolean;
+  userOverride: User;
 }
 
 /**
  * The settings used for the authorization library.
  */
 export interface AuthorizationContext {
-    user: User;
-    loginPath: string;
-    unauthorizedPath: string;
-    devSettings: DevSettings;
+  user: User;
+  loginPath: string;
+  unauthorizedPath: string;
+  devSettings: DevSettings;
 }
 
 /**
  * An array of user roles.
  */
-export type Roles = Array<string>;
+export type Roles = string[];
 
 /**
  * A user object from Azure Static Webapps /.auth/me.
  * See https://docs.microsoft.com/en-us/azure/static-web-apps/user-information?tabs=javascript#client-principal-data
  */
 export type User = {
-    identityProvider: string;
-    userId: string;
-    userDetails: string;
-    userRoles: Roles;
+  identityProvider: string;
+  userId: string;
+  userDetails: string;
+  userRoles: Roles;
 };
 
 export interface PrivateComponentProps {
-    allowedRoles: Roles;
-    allBut: boolean;
-    children: React.ReactNode;
+  allowedRoles: Roles;
+  allBut: boolean;
+  children: React.ReactNode;
 }
 
 export interface ProvideAuthProps {
-    customContext?: AuthorizationContext;
-    children: React.ReactNode;
+  customContext?: AuthorizationContext;
+  children: React.ReactNode;
 }
 
 export type PrivateComponent = (props: PrivateComponentProps & { [key: string]: any }) => JSX.Element;
@@ -87,36 +87,36 @@ export type PrivateComponent = (props: PrivateComponentProps & { [key: string]: 
  * @param userSetter
  */
 const getUser = async (userSetter: (user: User) => void): Promise<void> => {
-    const resp = await fetch('/.auth/me');
-    if (!resp.ok) {
-        throw new Error('There was a problem fetching the User Details from /.auth/me.');
-    }
-    try {
-        const json: User = (await resp.json()).clientPrincipal;
-        userSetter(json);
-    } catch (e) {
-        throw new Error('There was a problem parsing the JSON response from /.auth/me.');
-    }
+  const resp = await fetch('/.auth/me');
+  if (!resp.ok) {
+    throw new Error('There was a problem fetching the User Details from /.auth/me.');
+  }
+  try {
+    const json: User = (await resp.json()).clientPrincipal;
+    userSetter(json);
+  } catch (e) {
+    throw new Error('There was a problem parsing the JSON response from /.auth/me.');
+  }
 };
 
 const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
 
 const useProvideAuth = (customContext?: AuthorizationContext) => {
-    const [ctx, setCtx] = useState<AuthorizationContext>(customContext ?? DEFAULT_AUTH_CONTEXT);
-    useEffect(() => {
-        const newContext = cloneDeep(ctx);
-        if (ctx.devSettings.on) {
-            newContext.user = ctx.devSettings.userOverride;
-            setCtx(newContext);
-        } else {
-            const setter = (newUser: User) => {
-                newContext.user = newUser;
-                setCtx(newContext);
-            };
-            getUser(setter);
-        }
-    }, []);
-    return ctx;
+  const [ctx, setCtx] = useState<AuthorizationContext>(customContext ?? DEFAULT_AUTH_CONTEXT);
+  useEffect(() => {
+    const newContext = cloneDeep(ctx);
+    if (ctx.devSettings.on) {
+      newContext.user = ctx.devSettings.userOverride;
+      setCtx(newContext);
+    } else {
+      const setter = (newUser: User) => {
+        newContext.user = newUser;
+        setCtx(newContext);
+      };
+      getUser(setter);
+    }
+  }, []);
+  return ctx;
 };
 
 /**
@@ -126,15 +126,15 @@ const useProvideAuth = (customContext?: AuthorizationContext) => {
  * If a customContext is provided, it will override the default context on initialization.
  */
 const ProvideAuth = ({ customContext, children }: ProvideAuthProps) => {
-    const ctx = useProvideAuth(customContext);
-    return <authContext.Provider value={ctx}>{children}</authContext.Provider>;
+  const ctx = useProvideAuth(customContext);
+  return <authContext.Provider value={ctx}>{children}</authContext.Provider>;
 };
 
 /**
  * Gives access to the AuthorizationContext object from ProvideAuth.
  */
 const useAuth = () => {
-    return useContext(authContext);
+  return useContext(authContext);
 };
 
 /**
@@ -146,15 +146,15 @@ const useAuth = () => {
  * @param allBut Whether the component should be authorized based on "all but" the provided roles or simply on the provided roles.
  */
 const authorize = (allowedRoles: Roles, user: User, allBut: boolean = false) => {
-    let authorized = false;
-    if (allBut) {
-        // Make sure the user has at least one role that is not included in the list of disallowed roles
-        authorized = user.userRoles?.some((role) => !allowedRoles?.includes(role)) ?? false;
-    } else {
-        // Make sure the user has at least one role that is included in the list of allowed roles
-        authorized = user.userRoles?.some((role) => allowedRoles?.includes(role)) ?? false;
-    }
-    return authorized;
+  let authorized = false;
+  if (allBut) {
+    // Make sure the user has at least one role that is not included in the list of disallowed roles
+    authorized = user.userRoles?.some((role) => !allowedRoles?.includes(role)) ?? false;
+  } else {
+    // Make sure the user has at least one role that is included in the list of allowed roles
+    authorized = user.userRoles?.some((role) => allowedRoles?.includes(role)) ?? false;
+  }
+  return authorized;
 };
 
 export default ProvideAuth;
