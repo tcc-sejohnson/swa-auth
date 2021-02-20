@@ -39,4 +39,26 @@ describe('authorize correctly authorizes users', () => {
     const result = authorize([DefaultRoles.Authenticated, DefaultRoles.Anonymous], user, true);
     expect(result).toStrictEqual(false);
   });
+  test('User is denied when holding any roles when allowedRoles is empty and allBut == false', () => {
+    const user: User = cloneDeep(DEFAULT_TEST_USER);
+    user.userRoles = [DefaultRoles.Authenticated, DefaultRoles.Anonymous];
+    const result = authorize([], user, false);
+    expect(result).toStrictEqual(false);
+  });
+  test('User is allowed when holding any roles when allowedRoles is empty and allBut == true', () => {
+    const user: User = cloneDeep(DEFAULT_TEST_USER);
+    user.userRoles = [DefaultRoles.Authenticated, DefaultRoles.Anonymous];
+    const result = authorize([], user, true);
+    expect(result).toStrictEqual(true);
+  });
+  test('User is denied when holding no roles when allowedRoles is empty and allBut == true', () => {
+    const user: User = cloneDeep(DEFAULT_TEST_USER);
+    const result = authorize([], user, true);
+    expect(result).toStrictEqual(false);
+  });
+  test('User is denied when holding no roles when allowedRoles is empty and allBut == false', () => {
+    const user: User = cloneDeep(DEFAULT_TEST_USER);
+    const result = authorize([], user, false);
+    expect(result).toStrictEqual(false);
+  });
 });

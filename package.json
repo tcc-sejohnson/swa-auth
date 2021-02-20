@@ -26,7 +26,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "lint": "yarn eslint .",
     "prepare": "yarn build",
-    "prepublishOnly": "yarn test && yarn run",
+    "prepublishOnly": "yarn test",
     "preversion": "yarn lint",
     "version": "yarn format && git add --all src",
     "postversion": "git push && git push --tags"
