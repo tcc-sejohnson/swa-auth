@@ -89,13 +89,13 @@ export type PrivateComponent = (props: PrivateComponentProps & { [key: string]: 
 const getUser = async (userSetter: (user: User) => void): Promise<void> => {
   const resp = await fetch('/.auth/me');
   if (!resp.ok) {
-    throw new Error('There was a problem fetching the User Details from /.auth/me.');
+    userSetter(DEFAULT_USER);
   }
   try {
     const json: User = (await resp.json()).clientPrincipal;
     userSetter(json);
   } catch (e) {
-    throw new Error('There was a problem parsing the JSON response from /.auth/me.');
+    userSetter(DEFAULT_USER);
   }
 };
 
@@ -152,14 +152,14 @@ const authorize = (allowedRoles: Roles, user: User, allBut = false): boolean => 
   let authorized = false;
   if (allBut) {
     // Make sure the user has at least one role that is not included in the list of disallowed roles
-    authorized = user.userRoles?.some((role) => !allowedRoles?.includes(role)) ?? false;
+    authorized = user.userRoles.some((role) => !allowedRoles.includes(role));
   } else {
     // Make sure the user has at least one role that is included in the list of allowed roles
-    authorized = user.userRoles?.some((role) => allowedRoles?.includes(role)) ?? false;
+    authorized = user.userRoles.some((role) => allowedRoles.includes(role));
   }
   return authorized;
 };
 
 export default ProvideAuth;
 
-export { ProvideAuth, useAuth, authorize };
+export { ProvideAuth, useAuth, authorize, DEFAULT_AUTH_CONTEXT };
