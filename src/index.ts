@@ -8,6 +8,7 @@ import PrivateComponent from './components/private_components/PrivateComponent.j
 export type {
   DevSettings,
   AuthorizationContext,
+  AuthenticationStatus,
   Roles,
   User,
   PrivateComponentProps,

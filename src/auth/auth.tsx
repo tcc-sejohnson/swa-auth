@@ -13,8 +13,14 @@ const DEFAULT_DEV_SETTINGS: DevSettings = {
   userOverride: DEFAULT_USER,
 };
 
+const DEFAULT_AUTHENTICATION_STATUS: AuthenticationStatus = {
+  isAuthenticating: false,
+  setIsAuthenticating: undefined,
+};
+
 const DEFAULT_AUTH_CONTEXT: AuthorizationContext = {
   user: DEFAULT_USER,
+  authenticationStatus: DEFAULT_AUTHENTICATION_STATUS,
   loginPath: '/login',
   unauthorizedPath: '/login',
   devSettings: DEFAULT_DEV_SETTINGS,
@@ -32,6 +38,11 @@ export enum DefaultRoles {
   GlobalViewer = 'global_viewer',
 }
 
+export interface AuthenticationStatus {
+  isAuthenticating: boolean;
+  setIsAuthenticating: React.Dispatch<React.SetStateAction<boolean>> | undefined;
+}
+
 /**
  * If on === true, userOverride will be returned instead of
  * the actual user value from /.auth/me. This is useful for
@@ -47,6 +58,7 @@ export interface DevSettings {
  */
 export interface AuthorizationContext {
   user: User;
+  authenticationStatus: AuthenticationStatus;
   loginPath: string;
   unauthorizedPath: string;
   devSettings: DevSettings;
@@ -101,13 +113,25 @@ const getUser = async (userSetter: (user: User) => void): Promise<void> => {
 
 const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
 
-const useProvideAuth = (customContext?: Partial<AuthorizationContext>) => {
+/**
+ * Wrap components in this element to give them access to useAuth.
+ * If you want your whole app to be access-controlled, wrapp your App component.
+ * Any component using useAuth will have access to the full AuthorizationContext.
+ * If a customContext is provided, it will override the default context on initialization.
+ */
+const ProvideAuth = ({ customContext, children }: ProvideAuthProps): JSX.Element => {
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [ctx, setCtx] = useState<AuthorizationContext>({
     ...DEFAULT_AUTH_CONTEXT,
     ...customContext,
   });
   useEffect(() => {
+    setIsAuthenticating(true);
     const newContext = cloneDeep(ctx);
+    newContext.authenticationStatus = {
+      isAuthenticating: isAuthenticating,
+      setIsAuthenticating: setIsAuthenticating,
+    };
     if (ctx.devSettings.on) {
       newContext.user = ctx.devSettings.userOverride;
       setCtx(newContext);
@@ -118,18 +142,8 @@ const useProvideAuth = (customContext?: Partial<AuthorizationContext>) => {
       };
       getUser(setter);
     }
+    setIsAuthenticating(false);
   }, []);
-  return ctx;
-};
-
-/**
- * Wrap components in this element to give them access to useAuth.
- * If you want your whole app to be access-controlled, wrapp your App component.
- * Any component using useAuth will have access to the full AuthorizationContext.
- * If a customContext is provided, it will override the default context on initialization.
- */
-const ProvideAuth = ({ customContext, children }: ProvideAuthProps): JSX.Element => {
-  const ctx = useProvideAuth(customContext);
   return <authContext.Provider value={ctx}>{children}</authContext.Provider>;
 };
 

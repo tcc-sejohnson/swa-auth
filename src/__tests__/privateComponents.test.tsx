@@ -1,5 +1,5 @@
 import React from 'react';
-import { AuthorizationContext, DevSettings, DefaultRoles, User, ProvideAuth } from '../auth/auth';
+import { AuthorizationContext, DevSettings, DefaultRoles, User, ProvideAuth, AuthenticationStatus } from '../auth/auth';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { cloneDeep } from 'lodash';
@@ -11,6 +11,10 @@ const DEFAULT_TEST_USER: User = {
   userDetails: 'Unremarkable',
   userRoles: [],
 };
+const DEFAULT_AUTHENTICATION_STATUS: AuthenticationStatus = {
+  isAuthenticating: false,
+  setIsAuthenticating: undefined,
+};
 const SUCCESS_MESSAGE = "Success; you're authorized!";
 const RENDER_ON_AUTH = () => <div>{SUCCESS_MESSAGE}</div>;
 const DEV_OVERRIDE_SETTINGS: DevSettings = {
@@ -19,6 +23,7 @@ const DEV_OVERRIDE_SETTINGS: DevSettings = {
 };
 const CUSTOM_CONTEXT: AuthorizationContext = {
   user: cloneDeep(DEFAULT_TEST_USER),
+  authenticationStatus: DEFAULT_AUTHENTICATION_STATUS,
   loginPath: '/login',
   unauthorizedPath: '/unauthorized',
   devSettings: cloneDeep(DEV_OVERRIDE_SETTINGS),
