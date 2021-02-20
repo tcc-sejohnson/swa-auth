@@ -128,7 +128,7 @@ const useProvideAuth = (customContext?: Partial<AuthorizationContext>) => {
  * Any component using useAuth will have access to the full AuthorizationContext.
  * If a customContext is provided, it will override the default context on initialization.
  */
-const ProvideAuth = ({ customContext, children }: ProvideAuthProps) => {
+const ProvideAuth = ({ customContext, children }: ProvideAuthProps): JSX.Element => {
   const ctx = useProvideAuth(customContext);
   return <authContext.Provider value={ctx}>{children}</authContext.Provider>;
 };
@@ -136,7 +136,7 @@ const ProvideAuth = ({ customContext, children }: ProvideAuthProps) => {
 /**
  * Gives access to the AuthorizationContext object from ProvideAuth.
  */
-const useAuth = () => {
+const useAuth = (): AuthorizationContext => {
   return useContext(authContext);
 };
 
@@ -148,7 +148,7 @@ const useAuth = () => {
  * @param user An Azure Static Webapps User object (see the definition of the User type for more information).
  * @param allBut Whether the component should be authorized based on "all but" the provided roles or simply on the provided roles.
  */
-const authorize = (allowedRoles: Roles, user: User, allBut: boolean = false) => {
+const authorize = (allowedRoles: Roles, user: User, allBut = false): boolean => {
   let authorized = false;
   if (allBut) {
     // Make sure the user has at least one role that is not included in the list of disallowed roles

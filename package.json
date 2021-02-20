@@ -1,6 +1,6 @@
 {
   "name": "swa-auth",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A super-lightweight Auth library for Azure Static Web Apps.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,11 +24,11 @@
     "test": "jest --config jestconfig.json",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add --all src",
+    "lint": "yarn eslint .",
+    "prepare": "yarn build",
+    "prepublishOnly": "yarn test && yarn run",
+    "preversion": "yarn lint",
+    "version": "yarn format && git add --all src",
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
@@ -47,13 +47,16 @@
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "@types/react-router-dom": "^5.1.7",
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
     "babel-jest": "^26.6.3",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-react": "^7.22.0",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "react-dom": "^17.0.1",
     "ts-jest": "^26.5.1",
-    "tslint": "^6.1.3",
-    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.1.5"
   }
 }

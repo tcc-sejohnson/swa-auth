@@ -13,7 +13,7 @@ const PrivateRoute = ({
   allBut,
   children,
   ...rest
-}: PrivateRouteComponentProps & { unauthorizedRedirect: React.ReactNode }) => {
+}: PrivateRouteComponentProps & { unauthorizedRedirect: React.ReactNode }): JSX.Element => {
   const auth = useAuth();
   const isAuthorized = authorize(allowedRoles, auth.user, allBut);
   return <Route {...rest} render={() => (isAuthorized ? children : unauthorizedRedirect)} />;
