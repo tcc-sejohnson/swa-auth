@@ -27,7 +27,7 @@ export {
   useAuth,
   authorize,
   HiddenComponent,
-  ProtectedComponent as UnauthorizedComponent,
+  ProtectedComponent,
   useAuthRoutes,
   AuthBrowserRouter,
   AuthHashRouter,
