@@ -3,11 +3,11 @@ name: Deploy swa-auth to NPM
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
-      - master
+      - main
 
 jobs:
   qa_package:
