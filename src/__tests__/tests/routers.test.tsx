@@ -41,7 +41,7 @@ describe('Randome AuthRouter features work correctly', () => {
           allBut={true}
           redirect={<Redirect to="/redirect1" />}
         >
-          <div>Shouldn't ever land here!</div>
+          <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
           exact
@@ -50,7 +50,7 @@ describe('Randome AuthRouter features work correctly', () => {
           allBut={true}
           redirect={<Redirect to="/redirect2" />}
         >
-          <div>Shouldn't ever land here!</div>
+          <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
           exact
@@ -59,7 +59,7 @@ describe('Randome AuthRouter features work correctly', () => {
           allBut={true}
           redirect={<Redirect to="/redirect3" />}
         >
-          <div>Shouldn't ever land here!</div>
+          <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
           exact
@@ -68,7 +68,7 @@ describe('Randome AuthRouter features work correctly', () => {
           allBut={true}
           redirect={<Redirect to="/redirect4" />}
         >
-          <div>Shouldn't ever land here!</div>
+          <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
           exact
@@ -85,7 +85,7 @@ describe('Randome AuthRouter features work correctly', () => {
           allBut={true}
           redirect={<Redirect to="/redirect6" />}
         >
-          <div>Shouldn't ever land here!</div>
+          <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
       </AuthMemoryRouter>
     );
