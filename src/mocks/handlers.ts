@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { User, DefaultRole } from '../../auth/auth';
+import { User, DefaultRole } from '../auth/auth';
 
 const DEFAULT_USER: User = {
   identityProvider: 'aad',

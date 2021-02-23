@@ -1,10 +1,10 @@
 import React from 'react';
-import { DefaultRole, ProvideAuth, Roles } from '../../auth/auth';
-import { server, rest, DEFAULT_USER } from '../server/server';
+import { DefaultRole, ProvideAuth, Roles } from '../auth/auth';
+import { server, rest, DEFAULT_USER } from '../mocks/server';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { cloneDeep } from 'lodash';
-import LoginOrUnauthorizedComponent from '../../components/private_components/LoginOrUnauthorizedComponent';
+import LoginOrUnauthorizedComponent from '../components/private_components/LoginOrUnauthorizedComponent';
 
 const SUCCESS_MESSAGE = "Success; you're authorized!";
 const RENDER_ON_AUTH = () => <div>{SUCCESS_MESSAGE}</div>;

@@ -1,4 +1,4 @@
-import { authorize, DefaultRole, User } from '../../auth/auth';
+import { authorize, DefaultRole, User } from '../auth/auth';
 import '@testing-library/jest-dom/extend-expect';
 import { cloneDeep } from 'lodash';
 
