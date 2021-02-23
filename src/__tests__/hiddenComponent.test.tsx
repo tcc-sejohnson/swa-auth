@@ -1,22 +1,14 @@
 import React from 'react';
-import { DefaultRole, ProvideAuth, Roles } from '../auth/auth';
-import { server, rest, DEFAULT_USER } from '../mocks/server';
+import { DefaultRole, ProvideAuth } from '../auth/auth';
+import { server, userHandler } from '../mocks/server';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { cloneDeep } from 'lodash';
 import HiddenComponent from '../components/private_components/HiddenComponent';
 
 const SUCCESS_MESSAGE = "Success; you're authorized!";
 const RENDER_ON_AUTH = () => <div>{SUCCESS_MESSAGE}</div>;
 const AUTHENTICATING_MESSAGE = "You're authenticating, hold on!";
 const RENDER_ON_AUTHENTICATING = () => <div>{AUTHENTICATING_MESSAGE}</div>;
-const userHandler = (roles: Roles) => {
-  const CUSTOM_USER = cloneDeep(DEFAULT_USER);
-  CUSTOM_USER.userRoles = roles;
-  return rest.get('/.auth/me', (_, res, ctx) => {
-    return res(ctx.json({ clientPrincipal: CUSTOM_USER }));
-  });
-};
 
 describe('HiddenComponent correctly renders based on authorization', () => {
   it('briefly displays the default authenticating message, then displays the children.', async () => {

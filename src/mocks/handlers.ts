@@ -1,11 +1,20 @@
 import { rest } from 'msw';
-import { User, DefaultRole } from '../auth/auth';
+import { User, DefaultRole, Roles } from '../auth/auth';
+import { cloneDeep } from 'lodash';
 
 const DEFAULT_USER: User = {
   identityProvider: 'aad',
   userId: '420',
   userDetails: 'Unremarkable',
   userRoles: [DefaultRole.Anonymous, DefaultRole.Authenticated],
+};
+
+const userHandler = (roles: Roles) => {
+  const CUSTOM_USER = cloneDeep(DEFAULT_USER);
+  CUSTOM_USER.userRoles = roles;
+  return rest.get('/.auth/me', (_, res, ctx) => {
+    return res(ctx.json({ clientPrincipal: CUSTOM_USER }));
+  });
 };
 
 const handlers = [
@@ -19,4 +28,4 @@ const handlers = [
   // }),
 ];
 
-export { handlers, DEFAULT_USER };
+export { handlers, userHandler, DEFAULT_USER };

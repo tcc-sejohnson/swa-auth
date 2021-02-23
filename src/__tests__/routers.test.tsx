@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { DefaultRole, Roles } from '../auth/auth';
-import { server, rest, DEFAULT_USER } from '../mocks/server';
+import { server, userHandler } from '../mocks/server';
 import AuthMemoryRouter from '../components/router/routers/AuthMemoryRouter';
 import HiddenRoute from '../components/router/routes/HiddenRoute';
 import ProtectedRoute from '../components/router/routes/ProtectedRoute';
@@ -10,7 +10,6 @@ import LoginRedirectRoute from '../components/router/routes/LoginRedirectRoute';
 import UnauthorizedRedirectRoute from '../components/router/routes/UnauthorizedRedirectRoute';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { cloneDeep } from 'lodash';
 
 const SUCCESS_MESSAGE = "Success; you're authorized!";
 const RENDER_ON_AUTH = () => <div>{SUCCESS_MESSAGE}</div>;
@@ -20,13 +19,6 @@ const LOGIN_MESSAGE = "You're not logged in yet. Redirecting!";
 const RENDER_ON_LOGIN = () => <div>{LOGIN_MESSAGE}</div>;
 const UNAUTHORIZED_MESSAGE = "You're not allowed. Go away.";
 const RENDER_ON_UNAUTHORIZED = () => <div>{UNAUTHORIZED_MESSAGE}</div>;
-const userHandler = (roles: Roles) => {
-  const CUSTOM_USER = cloneDeep(DEFAULT_USER);
-  CUSTOM_USER.userRoles = roles;
-  return rest.get('/.auth/me', (_, res, ctx) => {
-    return res(ctx.json({ clientPrincipal: CUSTOM_USER }));
-  });
-};
 
 describe('Randome AuthRouter features work correctly', () => {
   it('handles route bouncing like it should', async () => {
