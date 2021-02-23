@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import { DefaultRole, Roles } from '../../auth/auth';
 import { server, rest, DEFAULT_USER } from '../server/server';
 import AuthMemoryRouter from '../../components/router/routers/AuthMemoryRouter';
@@ -27,6 +27,73 @@ const userHandler = (roles: Roles) => {
     return res(ctx.json({ clientPrincipal: CUSTOM_USER }));
   });
 };
+
+describe('Randome AuthRouter features work correctly', () => {
+  it('handles route bouncing like it should', async () => {
+    const roles = [DefaultRole.Anonymous, DefaultRole.Authenticated];
+    server.use(userHandler(roles));
+    render(
+      <AuthMemoryRouter>
+        <ProtectedRoute
+          exact
+          path="/"
+          allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
+          allBut={true}
+          redirect={<Redirect to="/redirect1" />}
+        >
+          <div>Shouldn't ever land here!</div>
+        </ProtectedRoute>
+        <ProtectedRoute
+          exact
+          path="/redirect1"
+          allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
+          allBut={true}
+          redirect={<Redirect to="/redirect2" />}
+        >
+          <div>Shouldn't ever land here!</div>
+        </ProtectedRoute>
+        <ProtectedRoute
+          exact
+          path="/redirect2"
+          allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
+          allBut={true}
+          redirect={<Redirect to="/redirect3" />}
+        >
+          <div>Shouldn't ever land here!</div>
+        </ProtectedRoute>
+        <ProtectedRoute
+          exact
+          path="/redirect3"
+          allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
+          allBut={true}
+          redirect={<Redirect to="/redirect4" />}
+        >
+          <div>Shouldn't ever land here!</div>
+        </ProtectedRoute>
+        <ProtectedRoute
+          exact
+          path="/redirect4"
+          allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
+          redirect={<Redirect to="/redirect5" />}
+        >
+          <div>Should land here!</div>
+        </ProtectedRoute>
+        <ProtectedRoute
+          exact
+          path="/redirect5"
+          allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
+          allBut={true}
+          redirect={<Redirect to="/redirect6" />}
+        >
+          <div>Shouldn't ever land here!</div>
+        </ProtectedRoute>
+      </AuthMemoryRouter>
+    );
+
+    expect(screen.queryByText("Shouldn't ever land here!")).not.toBeInTheDocument();
+    expect(await screen.findByText('Should land here!')).toBeInTheDocument();
+  });
+});
 
 describe(`AuthRouter works correctly with all route components`, () => {
   describe("HiddenRoute hides when it should and doesn't when it shouldn't", () => {
