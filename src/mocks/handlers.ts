@@ -10,6 +10,7 @@ const DEFAULT_USER: User = {
 };
 
 const userHandler = (roles: Roles) => {
+  // eslint-disable-line
   const CUSTOM_USER = cloneDeep(DEFAULT_USER);
   CUSTOM_USER.userRoles = roles;
   return rest.get('/.auth/me', (_, res, ctx) => {
