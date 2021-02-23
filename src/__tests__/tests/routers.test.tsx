@@ -44,7 +44,6 @@ describe('Randome AuthRouter features work correctly', () => {
           <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
-          exact
           path="/redirect1"
           allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
           allBut={true}
@@ -53,7 +52,6 @@ describe('Randome AuthRouter features work correctly', () => {
           <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
-          exact
           path="/redirect2"
           allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
           allBut={true}
@@ -62,7 +60,6 @@ describe('Randome AuthRouter features work correctly', () => {
           <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
-          exact
           path="/redirect3"
           allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
           allBut={true}
@@ -71,7 +68,6 @@ describe('Randome AuthRouter features work correctly', () => {
           <div>Shouldn&apos;t ever land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
-          exact
           path="/redirect4"
           allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
           redirect={<Redirect to="/redirect5" />}
@@ -79,7 +75,6 @@ describe('Randome AuthRouter features work correctly', () => {
           <div>Should land here!</div>
         </ProtectedRoute>
         <ProtectedRoute
-          exact
           path="/redirect5"
           allowedRoles={[DefaultRole.Anonymous, DefaultRole.Authenticated]}
           allBut={true}
@@ -90,8 +85,42 @@ describe('Randome AuthRouter features work correctly', () => {
       </AuthMemoryRouter>
     );
 
-    expect(screen.queryByText("Shouldn't ever land here!")).not.toBeInTheDocument();
     expect(await screen.findByText('Should land here!')).toBeInTheDocument();
+    expect(screen.queryByText("Shouldn't ever land here!")).not.toBeInTheDocument();
+  });
+  it('Obeys custom unauthorized routes from the router', async () => {
+    const roles = [DefaultRole.Anonymous, DefaultRole.Authenticated];
+    server.use(userHandler(roles));
+    render(
+      <AuthMemoryRouter unauthorizedRoute="/customUnauthorized">
+        <UnauthorizedRedirectRoute exact path="/" allowedRoles={[DefaultRole.GlobalAdmin]}>
+          <div>Shouldn&apos;t ever see this!</div>
+        </UnauthorizedRedirectRoute>
+        <Route path="/customUnauthorized">
+          <div>Should see this!</div>
+        </Route>
+      </AuthMemoryRouter>
+    );
+
+    expect(await screen.findByText('Should see this!')).toBeInTheDocument();
+    expect(screen.queryByText("Shouldn't ever see this!")).not.toBeInTheDocument();
+  });
+  it('Obeys custom login routes from the router', async () => {
+    const roles = [DefaultRole.Anonymous, DefaultRole.Authenticated];
+    server.use(userHandler(roles));
+    render(
+      <AuthMemoryRouter loginRoute="/customLogin">
+        <LoginRedirectRoute exact path="/" allowedRoles={[DefaultRole.GlobalAdmin]}>
+          <div>Shouldn&apos;t ever see this!</div>
+        </LoginRedirectRoute>
+        <Route path="/customLogin">
+          <div>Should see this!</div>
+        </Route>
+      </AuthMemoryRouter>
+    );
+
+    expect(await screen.findByText('Should see this!')).toBeInTheDocument();
+    expect(screen.queryByText("Shouldn't ever see this!")).not.toBeInTheDocument();
   });
 });
 
