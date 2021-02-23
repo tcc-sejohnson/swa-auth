@@ -1,28 +1,29 @@
-import { ProvideAuth, useAuth, authorize, DefaultRoles } from './auth/auth.js';
-import PrivateRoute from './components/routes/PrivateRoute.js';
-import PrivateRouteLoginOrUnauthorizedRedirect from './components/routes/PrivateRouteLoginOrUnauthorizedRedirect.js';
-import PrivateRouteLoginRedirect from './components/routes/PrivateRouteLoginRedirect.js';
-import PrivateRouteUnauthorizedRedirect from './components/routes/PrivateRouteUnauthorizedRedirect.js';
-import PrivateComponent from './components/private_components/PrivateComponent.js';
+import { ProvideAuth, useAuth, authorize, DefaultRole, LoginProvider } from './auth/auth';
+import AuthBrowserRouter from './components/router/routers/AuthBrowserRouter';
+import AuthHashRouter from './components/router/routers/AuthHashRouter';
+import AuthMemoryRouter from './components/router/routers/AuthMemoryRouter';
+import AuthStaticRouter from './components/router/routers/AuthStaticRouter';
+import { useAuthRoutes } from './components/router/routers/AuthRouter';
+import HiddenRoute from './components/router/routes/HiddenRoute';
+import HiddenComponent from './components/private_components/HiddenComponent';
+import ProtectedComponent from './components/private_components/ProtectedComponent';
 
-export type {
-  DevSettings,
-  AuthorizationContext,
-  AuthenticationStatus,
-  Roles,
-  User,
-  PrivateComponentProps,
-  ProvideAuthProps,
-} from './auth/auth';
+export type { AuthorizationContext, Roles, User, ProvideAuthProps } from './auth/auth';
+export type { HiddenComponentProps } from './components/private_components/HiddenComponent';
+export type { ProtectedComponentProps as UnauthorizedComponentProps } from './components/private_components/ProtectedComponent';
 
 export {
-  DefaultRoles,
+  DefaultRole,
+  LoginProvider,
   ProvideAuth,
   useAuth,
   authorize,
-  PrivateRoute,
-  PrivateRouteLoginOrUnauthorizedRedirect,
-  PrivateRouteLoginRedirect,
-  PrivateRouteUnauthorizedRedirect,
-  PrivateComponent,
+  HiddenComponent,
+  ProtectedComponent as UnauthorizedComponent,
+  useAuthRoutes,
+  AuthBrowserRouter,
+  AuthHashRouter,
+  AuthMemoryRouter,
+  AuthStaticRouter,
+  HiddenRoute,
 };

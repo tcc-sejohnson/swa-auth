@@ -1,5 +1,4 @@
 import React, { useContext, createContext, useState, useEffect } from 'react';
-import { cloneDeep } from 'lodash';
 
 const DEFAULT_USER: User = {
   identityProvider: '',
@@ -8,49 +7,45 @@ const DEFAULT_USER: User = {
   userRoles: [],
 };
 
-const DEFAULT_DEV_SETTINGS: DevSettings = {
-  on: false,
-  userOverride: DEFAULT_USER,
-};
-
-const DEFAULT_AUTHENTICATION_STATUS: AuthenticationStatus = {
-  isAuthenticating: false,
-  setIsAuthenticating: undefined,
-};
-
 const DEFAULT_AUTH_CONTEXT: AuthorizationContext = {
   user: DEFAULT_USER,
-  authenticationStatus: DEFAULT_AUTHENTICATION_STATUS,
-  loginPath: '/login',
-  unauthorizedPath: '/login',
-  devSettings: DEFAULT_DEV_SETTINGS,
+  isAuthenticating: true,
+  isLoggedIn: false,
+  loginAAD: async (): Promise<void> => Promise.resolve(),
+  loginFacebook: async (): Promise<void> => Promise.resolve(),
+  loginGitHub: async (): Promise<void> => Promise.resolve(),
+  loginGoogle: async (): Promise<void> => Promise.resolve(),
+  loginTwitter: async (): Promise<void> => Promise.resolve(),
+  logOut: () => {
+    return;
+  },
 };
 
 /**
  * A set of default roles you can use to authorize your users.
  * Want to make your own? Sure! Just declare your own enum.
  * You can also union your enum with this one to "inherit" its members.
+ * Here's an example:
+ * import { DefaultRole } from 'swa-auth';
+ * enum CustomRoles {
+ *   MyPrivatePageRole = 'my_private_page_role',
+ * }
+ * export const MyAppRoles = { ...CustomRoles, ...DefaultRoles };
+ * export type MyAppRoles = typeof MyAppRoles;
  */
-export enum DefaultRoles {
+export enum DefaultRole {
   Authenticated = 'authenticated',
   Anonymous = 'anonymous',
   GlobalAdmin = 'global_admin',
   GlobalViewer = 'global_viewer',
 }
 
-export interface AuthenticationStatus {
-  isAuthenticating: boolean;
-  setIsAuthenticating: React.Dispatch<React.SetStateAction<boolean>> | undefined;
-}
-
-/**
- * If on === true, userOverride will be returned instead of
- * the actual user value from /.auth/me. This is useful for
- * local development.
- */
-export interface DevSettings {
-  on: boolean;
-  userOverride: User;
+export enum LoginProvider {
+  AAD = 'aad',
+  Facebook = 'facebook',
+  GitHub = 'github',
+  Google = 'google',
+  Twitter = 'twitter',
 }
 
 /**
@@ -58,10 +53,14 @@ export interface DevSettings {
  */
 export interface AuthorizationContext {
   user: User;
-  authenticationStatus: AuthenticationStatus;
-  loginPath: string;
-  unauthorizedPath: string;
-  devSettings: DevSettings;
+  isAuthenticating: boolean;
+  isLoggedIn: boolean;
+  loginAAD: () => Promise<void>;
+  loginFacebook: () => Promise<void>;
+  loginGitHub: () => Promise<void>;
+  loginGoogle: () => Promise<void>;
+  loginTwitter: () => Promise<void>;
+  logOut: () => void;
 }
 
 /**
@@ -80,38 +79,12 @@ export type User = {
   userRoles: Roles;
 };
 
-export interface PrivateComponentProps {
-  allowedRoles: Roles;
-  allBut?: boolean;
-  children: React.ReactNode;
-}
+const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
 
 export interface ProvideAuthProps {
-  customContext?: Partial<AuthorizationContext>;
+  disallowedLoginProviders?: LoginProvider[];
   children: React.ReactNode;
 }
-
-export type PrivateComponent = (props: PrivateComponentProps & { [key: string]: any }) => JSX.Element;
-
-/**
- * Given a userSetter function accepting a User parameter, asynchronously
- * retrieve the user information from /.auth/me.
- * @param userSetter
- */
-const getUser = async (userSetter: (user: User) => void): Promise<void> => {
-  const resp = await fetch('/.auth/me');
-  if (!resp.ok) {
-    userSetter(DEFAULT_USER);
-  }
-  try {
-    const json: User = (await resp.json()).clientPrincipal;
-    userSetter(json);
-  } catch (e) {
-    userSetter(DEFAULT_USER);
-  }
-};
-
-const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
 
 /**
  * Wrap components in this element to give them access to useAuth.
@@ -119,31 +92,95 @@ const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
  * Any component using useAuth will have access to the full AuthorizationContext.
  * If a customContext is provided, it will override the default context on initialization.
  */
-const ProvideAuth = ({ customContext, children }: ProvideAuthProps): JSX.Element => {
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [ctx, setCtx] = useState<AuthorizationContext>({
-    ...DEFAULT_AUTH_CONTEXT,
-    ...customContext,
-  });
-  useEffect(() => {
-    setIsAuthenticating(true);
-    const newContext = cloneDeep(ctx);
-    newContext.authenticationStatus = {
-      isAuthenticating: isAuthenticating,
-      setIsAuthenticating: setIsAuthenticating,
-    };
-    if (ctx.devSettings.on) {
-      newContext.user = ctx.devSettings.userOverride;
-      setCtx(newContext);
-    } else {
-      const setter = (newUser: User) => {
-        newContext.user = newUser;
-        setCtx(newContext);
-      };
-      getUser(setter);
+const ProvideAuth = ({ disallowedLoginProviders, children }: ProvideAuthProps): JSX.Element => {
+  const [user, setUser] = useState(DEFAULT_USER);
+  const [isLoggedIn, setIsLoggedIn] = useState(DEFAULT_AUTH_CONTEXT.isLoggedIn);
+  const [isAuthenticating, setIsAuthenticating] = useState(DEFAULT_AUTH_CONTEXT.isAuthenticating);
+
+  const getUser = async (): Promise<User> => {
+    const resp = await fetch(`/.auth/me`);
+    if (!resp.ok) {
+      throw Error('There was a problem reaching the login service. Please try again later.');
     }
+    try {
+      const json: User = (await resp.json()).clientPrincipal;
+      return json;
+    } catch (e) {
+      throw Error('There was a problem reading the response from the login service. Please try again later.');
+    }
+  };
+
+  const forwardToAuth = (uri: string): void => {
+    const url = `${window.location.origin}/.auth/${uri}`;
+    window.location.assign(url);
+  };
+
+  const login = async (provider: LoginProvider): Promise<void> => {
+    if (disallowedLoginProviders?.includes(provider) ?? false) {
+      throw Error('Logins with this provider have been disabled by site owner.');
+    }
+    if (isLoggedIn) {
+      await refreshInternalUserState();
+    } else {
+      forwardToAuth(`login/${provider}`);
+    }
+  };
+
+  const loginAAD = async (): Promise<void> => {
+    login(LoginProvider.AAD);
+  };
+
+  const loginFacebook = async (): Promise<void> => {
+    login(LoginProvider.Facebook);
+  };
+
+  const loginGitHub = async (): Promise<void> => {
+    login(LoginProvider.GitHub);
+  };
+
+  const loginGoogle = async (): Promise<void> => {
+    login(LoginProvider.Google);
+  };
+
+  const loginTwitter = async (): Promise<void> => {
+    login(LoginProvider.Twitter);
+  };
+
+  const logOut = () => {
+    forwardToAuth('logout');
+  };
+
+  const refreshInternalUserState = async () => {
+    setIsAuthenticating(true);
+    const newUser = await getUser();
+    setUser(newUser);
     setIsAuthenticating(false);
+  };
+
+  useEffect(() => {
+    refreshInternalUserState();
+    return () => setUser(DEFAULT_USER);
   }, []);
+
+  useEffect(() => {
+    if (user.userRoles.length === 0) {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
+  }, [user]);
+
+  const ctx: AuthorizationContext = {
+    user,
+    isAuthenticating,
+    isLoggedIn,
+    loginAAD,
+    loginFacebook,
+    loginGitHub,
+    loginGoogle,
+    loginTwitter,
+    logOut,
+  };
   return <authContext.Provider value={ctx}>{children}</authContext.Provider>;
 };
 
@@ -173,7 +210,5 @@ const authorize = (allowedRoles: Roles, user: User, allBut = false): boolean => 
   }
   return authorized;
 };
-
-export default ProvideAuth;
 
 export { ProvideAuth, useAuth, authorize, DEFAULT_AUTH_CONTEXT };
