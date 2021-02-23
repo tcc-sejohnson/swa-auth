@@ -81,6 +81,23 @@ export type User = {
 
 const authContext = createContext<AuthorizationContext>(DEFAULT_AUTH_CONTEXT);
 
+const getUser = async (): Promise<User> => {
+  const resp = await fetch(`/.auth/me`);
+  if (!resp.ok) {
+    throw Error('There was a problem reaching the login service. Please try again later.');
+  }
+  const json = await resp.json();
+  if (json === null) {
+    return DEFAULT_USER;
+  }
+  try {
+    const user: User = json.clientPrincipal;
+    return user;
+  } catch (e) {
+    throw Error('There was a problem reading the response from the login service. Please try again later.');
+  }
+};
+
 export interface ProvideAuthProps {
   disallowedLoginProviders?: LoginProvider[];
   children: React.ReactNode;
@@ -96,19 +113,6 @@ const ProvideAuth = ({ disallowedLoginProviders, children }: ProvideAuthProps): 
   const [user, setUser] = useState(DEFAULT_USER);
   const [isLoggedIn, setIsLoggedIn] = useState(DEFAULT_AUTH_CONTEXT.isLoggedIn);
   const [isAuthenticating, setIsAuthenticating] = useState(DEFAULT_AUTH_CONTEXT.isAuthenticating);
-
-  const getUser = async (): Promise<User> => {
-    const resp = await fetch(`/.auth/me`);
-    if (!resp.ok) {
-      throw Error('There was a problem reaching the login service. Please try again later.');
-    }
-    try {
-      const json: User = (await resp.json()).clientPrincipal;
-      return json;
-    } catch (e) {
-      throw Error('There was a problem reading the response from the login service. Please try again later.');
-    }
-  };
 
   const forwardToAuth = (uri: string): void => {
     const url = `${window.location.origin}/.auth/${uri}`;
@@ -211,4 +215,4 @@ const authorize = (allowedRoles: Roles, user: User, allBut = false): boolean => 
   return authorized;
 };
 
-export { ProvideAuth, useAuth, authorize, DEFAULT_AUTH_CONTEXT };
+export { ProvideAuth, useAuth, authorize, getUser, DEFAULT_AUTH_CONTEXT, DEFAULT_USER };
