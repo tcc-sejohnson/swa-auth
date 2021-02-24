@@ -88,7 +88,7 @@ const getUser = async (): Promise<User> => {
   }
   const json = await resp.json();
   try {
-    if (json?.clientPrincipal === undefined) {
+    if (json?.clientPrincipal === undefined || json.clientPrincipal === null) {
       return DEFAULT_USER;
     }
     const user: User = json.clientPrincipal;

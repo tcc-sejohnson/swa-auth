@@ -13,6 +13,15 @@ describe('getUser handles varying responses correctly', () => {
     const user = await getUser();
     expect(user).toEqual(EMPTY_USER);
   });
+  it('responds with a default user when it receives a valid response but with null json', async () => {
+    server.use(
+      rest.get('/.auth/me', (_, res, ctx) => {
+        return res(ctx.json({ clientPrincipal: null }));
+      })
+    );
+    const user = await getUser();
+    expect(user).toEqual(EMPTY_USER);
+  });
   it('responds with a correct user when it receives an OK response', async () => {
     const user = await getUser();
     expect(user).toEqual(DEFAULT_USER);
