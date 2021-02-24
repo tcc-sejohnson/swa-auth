@@ -87,10 +87,10 @@ const getUser = async (): Promise<User> => {
     throw Error('There was a problem reaching the login service. Please try again later.');
   }
   const json = await resp.json();
-  if (json === null) {
-    return DEFAULT_USER;
-  }
   try {
+    if (json?.clientPrincipal === undefined) {
+      return DEFAULT_USER;
+    }
     const user: User = json.clientPrincipal;
     return user;
   } catch (e) {
@@ -167,7 +167,7 @@ const ProvideAuth = ({ disallowedLoginProviders, children }: ProvideAuthProps): 
   }, []);
 
   useEffect(() => {
-    if (user?.userRoles.length > 0) {
+    if (user.userRoles.length > 0) {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
