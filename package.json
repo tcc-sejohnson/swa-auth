@@ -1,6 +1,6 @@
 {
   "name": "swa-auth",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A super-lightweight Auth library for Azure Static Web Apps.",
   "main": "dist/auth.js",
   "types": "dist/auth.d.ts",
