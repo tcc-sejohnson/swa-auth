@@ -32,7 +32,6 @@ jobs:
           dry-run: true
           token: ${{ secrets.NPM_AUTH }}
   build_and_deploy_job:
-    needs: [qa_package]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     name: Build and Deploy swa-auth to NPM
