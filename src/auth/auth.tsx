@@ -167,10 +167,10 @@ const ProvideAuth = ({ disallowedLoginProviders, children }: ProvideAuthProps): 
   }, []);
 
   useEffect(() => {
-    if (user.userRoles.length === 0) {
-      setIsLoggedIn(false);
-    } else {
+    if (user?.userRoles.length > 0) {
       setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
     }
   }, [user]);
 
