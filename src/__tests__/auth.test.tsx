@@ -115,7 +115,3 @@ describe('authorize correctly authorizes users', () => {
 //   const auth = useAuth();
 //   return <div>{JSON.stringify(auth)}</div>;
 // };
-
-//tests on customContext to make sure it correctly overrides context settings
-
-//mock api tests to make sure getUser works correctly
