@@ -167,7 +167,9 @@ const ProvideAuth = ({ disallowedLoginProviders, children }: ProvideAuthProps): 
   }, []);
 
   useEffect(() => {
-    if (user.userRoles.length > 0) {
+    if (user.userRoles.length === 1 && user.userRoles[0] === DefaultRole.Anonymous) {
+      setIsLoggedIn(false);
+    } else if (user.userRoles.length > 0) {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
