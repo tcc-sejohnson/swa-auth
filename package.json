@@ -5,21 +5,59 @@
   "main": "dist/auth.js",
   "types": "dist/auth.d.ts",
   "repository": "git@github.com:tcc-sejohnson/swa-auth.git",
+  "keywords": [
+    "Azure",
+    "Static Web Apps",
+    "Auth"
+  ],
   "author": "S. Elliott Johnson",
-  "license": "GNU GPLv3",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/tcc-sejohnson/swa-auth/issues"
+  },
+  "homepage": "https://github.com/tcc-sejohnson/swa-auth/issues#readme",
   "private": false,
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
-    "prepublish": "tsc"
+    "test": "jest --config jest.config.ts",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "lint": "yarn eslint .",
+    "preversion": "yarn lint",
+    "version": "yarn format && git add --all src",
+    "postversion": "git push && git push --tags"
   },
   "dependencies": {
+    "lodash": "^4.17.20",
+    "react": "^17.0.1",
+    "react-router-dom": "^5.2.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.12.17",
+    "@babel/preset-react": "^7.12.13",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^11.2.5",
+    "@types/jest": "^26.0.20",
     "@types/lodash": "^4.14.168",
-    "@types/node": "^14.14.28",
+    "@types/node": "^14.14.30",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
     "@types/react-router-dom": "^5.1.7",
-    "lodash": "^4.17.20",
-    "react": "^17.0.1",
-    "react-router-dom": "^5.2.0",
-    "typescript": "^4.1.5"
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
+    "babel-jest": "^26.6.3",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-react": "^7.22.0",
+    "jest": "^26.6.3",
+    "msw": "^0.26.2",
+    "prettier": "^2.2.1",
+    "react-dom": "^17.0.1",
+    "ts-jest": "^26.5.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.5",
+    "whatwg-fetch": "^3.6.1"
   }
 }
