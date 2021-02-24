@@ -11,6 +11,7 @@ on:
 
 jobs:
   qa_package:
+    if: github.event_name != 'push' && github.event_name == 'pull_request'
     name: Lint and Test swa-auth
     runs-on: ubuntu-latest
     strategy:
@@ -25,17 +26,6 @@ jobs:
       - run: yarn install --frozen-lockfile
       - run: yarn lint
       - run: yarn test
-  dry_run_build_and_deploy:
-    needs: [qa_package]
-    if: (github.event_name != 'push' && (github.event_name == 'pull_request' && github.event.action != 'closed'))
-    runs-on: ubuntu-latest
-    name: Test NPM Deployment
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 15
-      - run: yarn install --frozen-lockfile
       - run: yarn build
       - uses: JS-DevTools/npm-publish@v1
         with:
@@ -51,6 +41,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 15
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn test
       - run: yarn install --frozen-lockfile
       - run: yarn build
       - uses: JS-DevTools/npm-publish@v1
